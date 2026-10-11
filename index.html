@@ -115,6 +115,13 @@
     .field-label { display: block; font-weight: 600; margin-bottom: 6px; }
     .dialog-input { width: 100%; box-sizing: border-box; }
 
+    /* sidebar */
+    .mock-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 25px; margin-bottom: 15px; }
+    .side-meter { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+    .side-demo { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 30px; align-items: start; }
+    .side-demo .watr-side { position: relative; transform: none; width: auto; z-index: auto; box-shadow: var(--watr-drop); }
+    .side-demo .watr-side__inner { position: static; width: auto; max-height: none; }
+
     /* mockup */
     .mock__body { padding: 20px; display: flex; flex-direction: column; gap: 18px; }
     .mock__head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; }
@@ -155,7 +162,7 @@
     </div>
 </nav>
 <div class="watr-strip watr-strip--warning">
-    <p>This guide is incomplete! It's version 0.4, keep poking at it.</p>
+    <p>This guide is incomplete! It's version 0.5, keep poking at it.</p>
 </div>
 
 <main class="page" id="top">
@@ -190,6 +197,11 @@
                     <label for="k-weight">heading weight</label>
                     <input type="range" id="k-weight" min="400" max="900" step="100" value="700">
                     <output for="k-weight" id="o-weight">700</output>
+                </div>
+                <div class="knob">
+                    <label for="k-side">sidebar width</label>
+                    <input type="range" id="k-side" min="180" max="320" step="10" value="250">
+                    <output for="k-side" id="o-side">250px</output>
                 </div>
 
                 <div class="presets">
@@ -537,6 +549,12 @@
             </div>
 
             <div class="part">
+                <h3>sidebar <code>.watr-shell .watr-side</code> <code>--color</code> <code>.watr-burger</code></h3>
+                <div class="stage side-demo" id="side-demo" aria-label="sidebar examples"></div>
+                <p class="note" style="margin-top: 10px;">Light on the left, <code>--color</code> on the right. Always on the left side of the page, so its shadow falls onto the content. See it working in the mockup.</p>
+            </div>
+
+            <div class="part">
                 <h3>panel <code>.watr-panel</code></h3>
                 <div class="stage">
                     <div class="watr-panel" style="max-width: 360px;">
@@ -551,10 +569,16 @@
 
     <section id="mockup">
         <h2>mockup</h2>
-        <p class="lede">A watrfiles page made only from the parts above. It works: switch tabs, sort the columns, tick rows, try Upload, or use the more menu.</p>
+        <p class="lede">A watrfiles page made only from the parts above. It works: pick a folder in the sidebar, switch tabs, sort the columns, tick rows, try Upload, or use the more menu.</p>
+
+        <div class="mock-controls">
+            <label class="watr-switch"><input type="checkbox" role="switch" id="mock-color"> colored sidebar</label>
+            <p class="note">The three-line button in the bar folds the sidebar away, and the page remembers it. Under 800px wide it opens as a drawer instead. Width is a knob up top.</p>
+        </div>
 
         <div class="stage stage--flush mock">
             <nav class="watr-bar" aria-label="watrfiles">
+                <button type="button" class="watr-burger" data-watr-shell="mock-shell" aria-controls="mock-side" aria-label="sidebar"></button>
                 <a href="#" class="watr-bar__home">watrfiles</a>
                 <button type="button" class="watr-bar__toggle">menu</button>
                 <div class="watr-bar__links">
@@ -564,14 +588,48 @@
             </nav>
             <div class="watr-strip"><p>This site is incomplete!</p></div>
 
-            <div class="mock__body">
+            <div class="watr-shell" id="mock-shell">
+                <aside class="watr-side" id="mock-side" aria-label="folders">
+                    <div class="watr-side__inner">
+                        <div>
+                            <h2 class="watr-side__label">files</h2>
+                            <nav class="watr-side__nav" id="mock-folders">
+                                <a href="#">all files <span class="watr-side__count">128</span></a>
+                                <a href="#" aria-current="page">backups <span class="watr-side__count">5</span></a>
+                                <a href="#">images <span class="watr-side__count">41</span></a>
+                                <a href="#">shared with me <span class="watr-side__count">12</span></a>
+                                <a href="#">trash <span class="watr-side__count">3</span></a>
+                            </nav>
+                        </div>
+                        <div>
+                            <h2 class="watr-side__label">you</h2>
+                            <nav class="watr-side__nav">
+                                <a href="#">accounts</a>
+                                <a href="#">settings</a>
+                                <button type="button" data-watr-open="dlg-expired">log out</button>
+                            </nav>
+                        </div>
+                        <div class="watr-side__foot">
+                            <div>
+                                <div class="side-meter"><b>storage</b><span class="muted">4.1 of 10 GB</span></div>
+                                <progress class="watr-progress" value="41" max="100" aria-label="storage used"></progress>
+                            </div>
+                            <div class="watr-side__me">
+                                <span class="watr-avatar watr-avatar--blob" data-watr-name="sword" aria-hidden="true"><i class="watr-avatar__status watr-avatar__status--online"></i></span>
+                                <span>sword<small>online</small></span>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+                <div class="watr-shell__main mock__body">
                 <ol class="watr-crumbs">
                     <li><a href="#">files</a></li>
-                    <li aria-current="page">backups</li>
+                    <li aria-current="page" id="mock-crumb">backups</li>
                 </ol>
 
                 <div class="mock__head">
-                    <h1>backups</h1>
+                    <h1 id="mock-title">backups</h1>
                     <div class="watr-row">
                         <button type="button" class="watr-btn" id="mock-upload">Upload</button>
                         <details class="watr-dropdown watr-dropdown--right">
@@ -628,6 +686,7 @@
                         <a href="#" aria-label="next page">&rsaquo;</a>
                     </nav>
                 </div>
+                </div>
             </div>
 
             <div class="watr-footer">&copy;watrfiles - 2026</div>
@@ -659,7 +718,7 @@
             <li>Link <code>watr.css</code> before your own CSS.</li>
             <li>Pick a hue at least 40° away from your other live sites (watrfiles is 196, the watrlabs logo is 237) and set it with the knobs above.</li>
             <li>Decide how loud it is: intensity, lift and heading weight. Change at least one of them from the last site you made.</li>
-            <li>Pick the layout: bar + sidebar for an app, split for auth and landing pages, one column for docs.</li>
+            <li>Pick the layout: bar + sidebar (<code>.watr-shell</code>) for an app, split for auth and landing pages, one column for docs. With a sidebar, pick light or colored and set its width.</li>
             <li>Pick this site's blob for the 404 and 500 pages, and write its one quote.</li>
             <li>Check the keep list. If something on it is missing, add it back before shipping.</li>
         </ol>
@@ -714,7 +773,8 @@
         hue:    { input: document.getElementById("k-hue"),    out: document.getElementById("o-hue"),    prop: "--watr-hue",         unit: "" },
         chroma: { input: document.getElementById("k-chroma"), out: document.getElementById("o-chroma"), prop: "--watr-chroma",      unit: "" },
         lift:   { input: document.getElementById("k-lift"),   out: document.getElementById("o-lift"),   prop: "--watr-lift",        unit: "px" },
-        weight: { input: document.getElementById("k-weight"), out: document.getElementById("o-weight"), prop: "--watr-head-weight", unit: "" }
+        weight: { input: document.getElementById("k-weight"), out: document.getElementById("o-weight"), prop: "--watr-head-weight", unit: "" },
+        side:   { input: document.getElementById("k-side"),   out: document.getElementById("o-side"),   prop: "--watr-sidebar-w",   unit: "px" }
     };
     const snippet = document.getElementById("snippet");
     const presetButtons = document.querySelectorAll("[data-hue]");
@@ -737,6 +797,7 @@
             "    --watr-chroma: " + knobs.chroma.input.value + ";\n" +
             "    --watr-lift: " + knobs.lift.input.value + "px;\n" +
             "    --watr-head-weight: " + knobs.weight.input.value + ";\n" +
+            "    --watr-sidebar-w: " + knobs.side.input.value + "px;\n" +
             "}";
         presetButtons.forEach(function (b) {
             const match = b.dataset.hue === hue && parseFloat(b.dataset.chroma) === chroma &&
@@ -824,6 +885,31 @@
     document.getElementById("t-warn").addEventListener("click", function () { watr.toast("You've used 90% of your storage.", { type: "warning" }); });
     document.getElementById("t-danger").addEventListener("click", function () {
         watr.toast("Upload failed. The file is over 2 GB.", { type: "danger", action: "retry", time: 0, onAction: function () { watr.toast("Trying again", { type: "plain" }); } });
+    });
+
+    // sidebar: two static copies for the parts list, light and colored
+    const sideDemo = document.getElementById("side-demo");
+    [false, true].forEach(function (colored) {
+        const copy = document.getElementById("mock-side").cloneNode(true);
+        copy.removeAttribute("id");
+        copy.querySelectorAll("[id]").forEach(function (el) { el.removeAttribute("id"); });
+        copy.classList.toggle("watr-side--color", colored);
+        sideDemo.appendChild(copy);
+    });
+    sideDemo.inert = true;
+
+    document.getElementById("mock-color").addEventListener("change", function () {
+        document.getElementById("mock-side").classList.toggle("watr-side--color", this.checked);
+    });
+
+    document.getElementById("mock-folders").addEventListener("click", function (e) {
+        const link = e.target.closest("a");
+        if (!link) return;
+        this.querySelectorAll("a").forEach(function (a) { a.removeAttribute("aria-current"); });
+        link.setAttribute("aria-current", "page");
+        const name = link.firstChild.textContent.trim();
+        document.getElementById("mock-title").textContent = name;
+        document.getElementById("mock-crumb").textContent = name;
     });
 
     // mockup: fake upload, copy link

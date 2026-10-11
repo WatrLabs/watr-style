@@ -18,7 +18,7 @@ Swap `@main` for a tag (like `@v0.4`) once there are releases, so a site doesn't
 | `index.html` | live guide. open it in a browser, drag the knobs, copy the snippet, click around the mockup |
 | `assets/` | the blobs and the watrlabs icon |
 
-Version 0.4. Taken from [watrfiles](https://github.com/watrabi/watrfiles) (`public/assets/base.css`, the login, 404 and 500 pages).
+Version 0.5. Taken from [watrfiles](https://github.com/watrabi/watrfiles) (`public/assets/base.css`, the login, 404 and 500 pages).
 
 ---
 
@@ -72,6 +72,7 @@ Set these in the site's own CSS, after `watr.css`:
     --watr-chroma: 1;         /* 0.4 calm, 1 normal, 1.3 loud */
     --watr-lift: 5px;         /* 3px flat, 5px normal, 8px dramatic */
     --watr-head-weight: 700;  /* 500 calm, 700 normal, 900 shouty */
+    --watr-sidebar-w: 250px;  /* only matters if the site has a sidebar */
 }
 ```
 
@@ -79,7 +80,8 @@ The neutrals (page, surface, fields, text) all take a tiny bit of the hue too, s
 
 Other things that change per site but aren't CSS:
 
-- **layout**: bar + sidebar for an app, split for auth and landing pages, one column for docs and text
+- **layout**: bar + sidebar (`.watr-shell`) for an app, split for auth and landing pages, one column for docs and text
+- **sidebar style**: light (surface color) or `--color` (the bar's color, so bar and sidebar make one L-shaped frame)
 - **the blob**: pick a face that fits the site. thinking for 404, panic for 500 is the watrfiles set
 - **the quote**: one in-joke for the split panel, attributed like `- sword 2026`. never reuse one across sites
 - **strips**: what the warning strip says, or whether the site has one at all
@@ -110,7 +112,9 @@ The exception is the page itself: the `body` background, text color and font, pl
 | split | `.watr-split` `.watr-split__aside` `.watr-split__main` | the thick rule layout |
 | blob | `.watr-blob` `.watr-blob__face` | error and empty states |
 | quote | `.watr-quote` + `<cite>` | cite gets the `- ` prefix automatically |
-| sidebar | `.watr-sidebar` `.is-hidden` | toggle `.is-hidden` with JS |
+| shell + sidebar | `.watr-shell` > `aside.watr-side` (> `.watr-side__inner`) + `.watr-shell__main` | the app layout: sidebar under the bar, page beside it. sidebar is always on the left so its drop falls onto the page. inside: `.watr-side__label` section names, `.watr-side__nav` links (`aria-current="page"` goes bright, `.watr-side__count` for numbers), `.watr-side__foot` for a storage meter or the signed-in person (`.watr-side__me`). `--color` gives it the bar's color |
+| burger | `<button class="watr-burger" data-watr-shell="shell-id">` | first thing in the bar. desktop: folds the sidebar away and remembers it. under 800px: opens the sidebar as a drawer over the page; backdrop, escape or picking a link closes it |
+| old sidebar | `.watr-sidebar` `.is-hidden` | the original fixed sidebar from watrfiles. use `.watr-shell` for new stuff |
 | checks | `.watr-check` wrapping a checkbox or radio | square box (radios stay round), bright when on |
 | switch | `.watr-switch` wrapping a checkbox | square track, square knob that casts a tiny drop |
 | tabs | `.watr-tabs` + `.watr-tab` with `aria-selected` | tabs sit on a thick bright rule and the active one joins it |
@@ -153,7 +157,8 @@ Load it at the end of `<body>`. It wires things up by attribute, so most of the 
 - `data-watr-open="id"` opens a dialog, `data-watr-close` closes the one it's in, clicking the backdrop closes it too. Read `dialog.returnValue` in its `close` event to see which button was pressed.
 - `watr.toast("Uploaded backup.zip", { type, action, onAction, time })`. `type` is `info` (default), `plain`, `warning` or `danger`. `time` is in ms, `0` means it stays until closed. Use `time: 0` for errors.
 - Tabs select on click. Header buttons in a `.watr-table` sort that column (put raw numbers in `data-sort` for sizes). Row checkboxes toggle `.is-selected`, and a header checkbox selects every row.
-- `data-watr-sidebar="id"` toggles a sidebar.
+- `data-watr-shell="id"` on the burger runs the sidebar: fold on desktop (saved in localStorage per shell id), drawer on phones.
+- `data-watr-sidebar="id"` toggles the old `.watr-sidebar`.
 - Turns on the bar's phone menu button, fills `data-label` on `--stack` tables, and picks blob faces. If you add markup later, call `watr.setup(element)`.
 
 ### phones
@@ -161,6 +166,7 @@ Load it at the end of `<body>`. It wires things up by attribute, so most of the 
 Everything is built to hold up at 375px wide:
 
 - the bar folds its links behind "menu" (use the newer bar markup above)
+- the sidebar turns into a drawer under 800px
 - tabs stay on one row and scroll sideways
 - `--stack` tables become cards; plain tables scroll sideways inside their wrap
 - split and blob layouts stack, the thick rule turns flat
@@ -211,6 +217,7 @@ Things I noticed while pulling this out of watrfiles. Decide on each and move it
 
 ## changelog
 
+- **0.5** (2026-10): sidebar. `.watr-shell` + `.watr-side` (light or `--color`), `.watr-burger`, a width knob, and the mockup is now a full sidebar app.
 - **0.4** (2026-10): phone layout pass. bar folds into a menu, tabs scroll, tables can stack into cards. default avatars: a person, or one of six blobs picked from the username.
 - **0.3** (2026-10): avatar status is a bar along the bottom instead of a dot. initials avatars are bright on deep. panels are a pale wash of the hue instead of flat grey.
 - **0.2** (2026-10): the bar no longer casts a shadow onto alert strips; the stack casts one shadow from its bottom. fixed the page background not changing in dark mode when a reset is loaded. added modals, toasts, tables, tabs, dropdowns, checks, switches, tags, avatars, tooltips, progress, loading, pagination, breadcrumbs, `watr.js`, and a full mockup page.

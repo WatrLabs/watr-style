@@ -16,6 +16,7 @@
         --watr-head-weight: 700;  /* heading weight. 500 calm, 700 normal, 900 shouty */
         --watr-speed: 0.2s;       /* everything moves at this speed */
         --watr-toast-time: 4s;    /* how long a toast stays up */
+        --watr-sidebar-w: 250px;  /* sidebar width. 200 tight, 250 normal, 300 roomy */
     }
 
     /* ---------- derived: don't edit these, edit the knobs ---------- */
@@ -53,7 +54,6 @@
         --watr-foot-h: 50px;
         --watr-field-radius: 0.3em;
         --watr-rule-w: 5px;
-        --watr-sidebar-w: 250px;
     }
 
     @media (prefers-color-scheme: dark) {
@@ -395,7 +395,7 @@ body {
     }
     .watr-quote cite::before { content: "- "; }
 
-    /* sidebar: slides in from the left, pushes nothing, casts the drop */
+    /* old sidebar from watrfiles: fixed, slides over the page. new sites should use .watr-shell + .watr-side */
     .watr-sidebar {
         position: fixed;
         top: 0;
@@ -408,6 +408,156 @@ body {
         box-shadow: var(--watr-drop);
     }
     .watr-sidebar.is-hidden { width: 0; box-shadow: none; }
+
+    /* ---------- shell + sidebar: a sidebar under the bar, the page beside it ----------
+       <nav class="watr-bar"><button class="watr-burger" data-watr-shell="app" aria-label="sidebar"></button> ...</nav>
+       <div class="watr-shell" id="app">
+           <aside class="watr-side"><div class="watr-side__inner"> sections... </div></aside>
+           <main class="watr-shell__main"> page... </main>
+       </div>
+       the sidebar sits on the left so its drop falls onto the page. desktop: the burger folds it
+       away (and watr.js remembers that). under 800px it's a drawer over the page instead. */
+    .watr-shell {
+        display: grid;
+        grid-template-columns: var(--watr-sidebar-w) minmax(0, 1fr);
+        flex: 1;
+        min-height: 0;
+    }
+    .watr-shell.is-collapsed { grid-template-columns: 0 minmax(0, 1fr); }
+    .watr-shell__main { min-width: 0; }
+
+    .watr-side {
+        position: relative;
+        z-index: 2;
+        overflow: hidden;
+        background-color: var(--watr-surface);
+        color: var(--watr-text);
+        box-shadow: var(--watr-drop);
+    }
+    .watr-shell.is-collapsed .watr-side { box-shadow: none; }
+    .watr-side__inner {
+        position: sticky;
+        top: 0;
+        box-sizing: border-box;
+        width: var(--watr-sidebar-w);
+        max-height: 100vh;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        padding-block: 18px;
+    }
+    .watr-side__label {
+        margin: 0 0 4px;
+        padding-inline: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: lowercase;
+        color: var(--watr-muted);
+    }
+    .watr-side__nav { display: flex; flex-direction: column; }
+    .watr-side__nav a, .watr-side__nav button {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        min-height: 40px;
+        padding-inline: 20px;
+        font: inherit;
+        text-align: left;
+        text-decoration: none;
+        border: none;
+        background: none;
+        color: inherit;
+        cursor: pointer;
+    }
+    .watr-side__nav a:hover, .watr-side__nav button:hover { background-color: var(--watr-field); }
+    .watr-side__nav [aria-current="page"] {
+        font-weight: 700;
+        background-color: var(--watr-bright);
+        color: var(--watr-ink);
+    }
+    .watr-side__nav [aria-current="page"]:hover { background-color: var(--watr-mid); }
+    .watr-side__count {
+        font-size: 0.8rem;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+        opacity: 0.7;
+    }
+    .watr-side__foot {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 6px;
+        padding: 16px 20px 0;
+        border-top: 1px solid var(--watr-field-over);
+        font-size: 0.85rem;
+    }
+    .watr-side__foot .muted { color: var(--watr-muted); }
+    .watr-side__me { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1rem; }
+    .watr-side__me small { display: block; font-weight: 500; font-size: 0.8rem; color: var(--watr-muted); }
+
+    /* --color: the sidebar takes the bar's color, so bar and sidebar make one L-shaped frame */
+    .watr-side--color {
+        background-color: var(--watr-bar);
+        color: var(--watr-on-bar);
+    }
+    .watr-side--color .watr-side__label,
+    .watr-side--color .watr-side__foot .muted,
+    .watr-side--color .watr-side__me small { color: rgb(255 255 255 / 0.75); }
+    .watr-side--color .watr-side__nav a:hover, .watr-side--color .watr-side__nav button:hover { background-color: rgb(0 0 0 / 0.12); }
+    .watr-side--color .watr-side__nav [aria-current="page"]:hover { background-color: var(--watr-mid); }
+    .watr-side--color .watr-side__foot { border-top-color: rgb(255 255 255 / 0.25); }
+    .watr-side--color progress.watr-progress { background-color: rgb(255 255 255 / 0.25); }
+    .watr-side--color progress.watr-progress::-webkit-progress-bar { background-color: rgb(255 255 255 / 0.25); }
+
+    /* the burger: three square-ended lines, lives at the left end of the bar */
+    .watr-burger {
+        flex: none;
+        width: var(--watr-bar-h);
+        height: var(--watr-bar-h);
+        padding: 0;
+        border: none;
+        cursor: pointer;
+        color: var(--watr-on-bar);
+        background-color: transparent;
+        background-image: linear-gradient(currentColor 0 0), linear-gradient(currentColor 0 0), linear-gradient(currentColor 0 0);
+        background-size: 20px 3px;
+        background-repeat: no-repeat;
+        background-position: center calc(50% - 7px), center, center calc(50% + 7px);
+    }
+    .watr-burger:hover { background-color: rgb(0 0 0 / 0.12); }
+    .watr-bar > .watr-burger + .watr-bar__home { margin-left: 5px; }
+
+    .watr-shell__scrim { display: none; }
+
+    @media (max-width: 800px) {
+        .watr-shell, .watr-shell.is-collapsed { grid-template-columns: minmax(0, 1fr); }
+        .watr-side {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 900;
+            width: min(85vw, var(--watr-sidebar-w));
+            overflow-y: auto;
+            transform: translateX(-100%);
+            box-shadow: none;
+            padding-top: env(safe-area-inset-top, 0px);
+        }
+        .watr-side__inner { position: static; width: auto; max-height: none; }
+        .watr-shell.is-open .watr-side { transform: none; box-shadow: var(--watr-drop-big); }
+        .watr-shell__scrim {
+            display: block;
+            position: fixed;
+            inset: 0;
+            z-index: 899;
+            background-color: rgb(0 0 0 / 0.4);
+            opacity: 0;
+            pointer-events: none;
+        }
+        .watr-shell.is-open .watr-shell__scrim { opacity: 1; pointer-events: auto; }
+    }
 
     /* modal: dim the page, center the content */
     .watr-modal {

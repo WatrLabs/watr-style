@@ -5,7 +5,10 @@
 //             clicking the dimmed backdrop also closes it
 //   toasts:   watr.toast("Uploaded backup.zip", { type: "info", action: "undo", onAction: fn, time: 4000 })
 //             type is "info" (default), "plain", "warning" or "danger". time 0 = stays until closed
-//   sidebar:  <button data-watr-sidebar="sidebar"> toggles .is-hidden on #sidebar
+//   shell:    <button class="watr-burger" data-watr-shell="app"> shows and hides the .watr-side in
+//             <div class="watr-shell" id="app">. on desktop it folds the sidebar away and remembers
+//             that; under 800px it opens the sidebar as a drawer. backdrop, escape or a link close it
+//   sidebar:  (old) <button data-watr-sidebar="sidebar"> toggles .is-hidden on #sidebar
 //   tabs:     clicking a [role=tab] inside .watr-tabs selects it
 //   tables:   a <button> in a .watr-table header cell sorts by that column. put a raw value in
 //             data-sort on cells that don't sort by their text (sizes, dates)
@@ -100,6 +103,33 @@
     }
 
     const BLOB_FACES = 6;
+    const DRAWER = window.matchMedia("(max-width: 800px)");
+
+    function remembered(key, value) {
+        try {
+            if (value === undefined) return localStorage.getItem(key);
+            localStorage.setItem(key, value);
+        } catch (err) { /* private mode or blocked storage: just don't remember */ }
+        return null;
+    }
+
+    function syncShell(shell) {
+        const shown = DRAWER.matches ? shell.classList.contains("is-open") : !shell.classList.contains("is-collapsed");
+        document.querySelectorAll('[data-watr-shell="' + shell.id + '"]').forEach(function (btn) {
+            btn.setAttribute("aria-expanded", shown ? "true" : "false");
+        });
+    }
+
+    function toggleShell(shell, show) {
+        if (DRAWER.matches) {
+            shell.classList.toggle("is-open", show === undefined ? !shell.classList.contains("is-open") : show);
+        } else {
+            const collapse = show === undefined ? !shell.classList.contains("is-collapsed") : !show;
+            shell.classList.toggle("is-collapsed", collapse);
+            if (shell.id) remembered("watr-sidebar:" + shell.id, collapse ? "collapsed" : "open");
+        }
+        syncShell(shell);
+    }
 
     function hash(text) {
         let h = 0;
@@ -133,7 +163,30 @@
         root.querySelectorAll(".watr-bar__toggle:not([aria-expanded])").forEach(function (btn) {
             btn.setAttribute("aria-expanded", "false");
         });
+
+        root.querySelectorAll(".watr-shell").forEach(function (shell) {
+            if (!shell.querySelector(":scope > .watr-shell__scrim")) {
+                const scrim = document.createElement("div");
+                scrim.className = "watr-shell__scrim";
+                scrim.addEventListener("click", function () { toggleShell(shell, false); });
+                shell.appendChild(scrim);
+            }
+            if (shell.id && remembered("watr-sidebar:" + shell.id) === "collapsed") shell.classList.add("is-collapsed");
+            syncShell(shell);
+        });
     }
+
+    DRAWER.addEventListener("change", function () {
+        document.querySelectorAll(".watr-shell").forEach(function (shell) {
+            shell.classList.remove("is-open");
+            syncShell(shell);
+        });
+    });
+
+    document.addEventListener("keydown", function (e) {
+        if (e.key !== "Escape") return;
+        document.querySelectorAll(".watr-shell.is-open").forEach(function (shell) { toggleShell(shell, false); });
+    });
 
     document.addEventListener("change", function (e) {
         if (!e.target.matches(".watr-table input[type=checkbox]")) return;
@@ -171,6 +224,17 @@
             e.target.close("");
             return;
         }
+
+        const shellToggle = e.target.closest("[data-watr-shell]");
+        if (shellToggle) {
+            const shell = document.getElementById(shellToggle.dataset.watrShell);
+            if (shell) toggleShell(shell);
+            return;
+        }
+
+        // picking a link in the drawer closes it
+        const sideLink = e.target.closest(".watr-shell.is-open .watr-side a");
+        if (sideLink) toggleShell(sideLink.closest(".watr-shell"), false);
 
         const sideToggle = e.target.closest("[data-watr-sidebar]");
         if (sideToggle) {
