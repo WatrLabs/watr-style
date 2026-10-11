@@ -2,7 +2,14 @@
 
 How my sites look, written down so every new one starts from the same place.
 
-This folder is self-contained. Copy it into any project.
+Copy this repo into any project, or load the kit straight from GitHub:
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/WatrLabs/watr-style@main/watr.css">
+<script src="https://cdn.jsdelivr.net/gh/WatrLabs/watr-style@main/watr.js" defer></script>
+```
+
+Swap `@main` for a tag (like `@v0.4`) once there are releases, so a site doesn't change under you when the kit does.
 
 | file | what it is |
 | --- | --- |
@@ -11,7 +18,7 @@ This folder is self-contained. Copy it into any project.
 | `index.html` | live guide. open it in a browser, drag the knobs, copy the snippet, click around the mockup |
 | `assets/` | the blobs and the watrlabs icon |
 
-Version 0.4. Taken from watrfiles (`public/assets/base.css`, the login, 404 and 500 pages).
+Version 0.4. Taken from [watrfiles](https://github.com/watrabi/watrfiles) (`public/assets/base.css`, the login, 404 and 500 pages).
 
 ---
 
