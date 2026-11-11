@@ -391,17 +391,11 @@ body {
         display: flex;
         align-items: center;
         padding-inline: 15px;
-        box-shadow: var(--watr-drop);
         position: relative;
-        z-index: 2;
+        z-index: 1;
     }
     .watr-strip p { margin: 0; }
-
-    /* the bar and the strips under it are one block: only the bottom of the stack casts */
-    .watr-bar:has(+ .watr-strip),
-    .watr-strip:has(+ .watr-strip) {
-        box-shadow: none;
-    }
+    /* strips tuck in behind the bar: the bar casts its drop onto them, they cast nothing */
     .watr-strip--warning { --watr-tone: var(--watr-warning); }
     .watr-strip--info    { --watr-tone: var(--watr-mid); }
 

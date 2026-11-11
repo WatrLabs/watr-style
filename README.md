@@ -46,7 +46,7 @@ If two of my sites sat side by side, you should be able to tell they're by the s
 
 2. **Light from the top-left.** Shadows are always offset down and to the right, with x, y and blur equal: `5px 5px 5px rgb(15 15 15 / .4)`. Never a centered glow, never a shadow going up.
 
-3. **Framed by bars.** A full-width bar on top (45px), optional notice strips stacked directly under it (a line in red, yellow or blue under it), a footer at the bottom. The bars are the surface color with normal text and cast the drop onto the page, so the hue is saved for things you can press (`--color` brings back the full-hue frame). The site's mark sits at the left of the bar, on its own. The bar and its strips are one block: nothing inside the stack casts a shadow, only the bottom of it does. (The kit handles this with `:has()`, so just put strips straight after the bar.)
+3. **Framed by bars.** A full-width bar on top (45px), optional notice strips stacked directly under it (a line in red, yellow or blue under it), a footer at the bottom. The bars are the surface color with normal text and cast the drop onto the page, so the hue is saved for things you can press (`--color` brings back the full-hue frame). The site's mark sits at the left of the bar, on its own. Strips tuck in behind the bar: the bar casts its drop onto them and they cast nothing, so they read as sitting underneath it. Put them straight after the bar.
 
 4. **Square buttons, soft fields.** Buttons have 0 radius, a calm deep fill (`--watr-fill`) with white text, 10px padding, a step lighter or darker on hover. The bright blue stays for small accents (focus rings, checks, dots, lines), never under words. Inputs are filled grey, no border, 0.3em radius. Keep that contrast.
 
